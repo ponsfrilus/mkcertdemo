@@ -1,0 +1,23 @@
+# Dynamic configuration
+http:
+  routers:
+    {{ env "DOCKER_WEB_SERVICE_NAME" | trimAll "\"" }}-router:
+      entryPoints:
+        - websecure
+      service: {{ env "DOCKER_WEB_SERVICE_NAME" | trimAll "\"" }}-srv
+      rule: Host(`{{ env "MKCERT_URL" | trimAll "\"" }}`)
+      tls: true
+  services:
+    {{ env "DOCKER_WEB_SERVICE_NAME" | trimAll "\"" }}-srv:
+      loadBalancer:
+        servers:
+          - url: http://{{ env "DOCKER_WEB_SERVICE_NAME" | trimAll "\"" }}
+
+tls:
+  certificates:
+    - certFile: /etc/certs/{{ env "MKCERT_URL" | trimAll "\"" }}.pem
+      keyFile: /etc/certs/{{ env "MKCERT_URL" | trimAll "\"" }}-key.pem
+
+traefik:
+  enable: true
+

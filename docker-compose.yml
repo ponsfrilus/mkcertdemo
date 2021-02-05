@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  # demo app with nginx
+  web:
+    image: nginxdemos/hello
+    container_name: web
+
+  # mkcert
+  mkcert:
+    build:
+      context: ./
+    container_name: mkcert
+    volumes:
+      - ./certs:/certs
+      - ~/.local/share/mkcert:/root/.local/share/mkcert
+      - ~/.mozilla/firefox:/root/.mozilla/firefox:rw
+      - ~/.pki/nssdb:/root/.pki/nssdb:rw
+
+  # Traefik
+  traefik:
+    image: traefik:2.4
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./traefik.static.yml:/etc/traefik/traefik.yml # Traefik static config
+      - ./traefik.dynamic.yml:/etc/traefik/traefik.dynamic.yml # Traefik dynamic config
+      - ./certs:/etc/certs
+    environment:
+      - MKCERT_URL="${MKCERT_URL}"
+      - DOCKER_WEB_SERVICE_NAME="${DOCKER_WEB_SERVICE_NAME:-web}"
+

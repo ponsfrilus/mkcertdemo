@@ -1,0 +1,32 @@
+# Static configuration
+global:
+  sendAnonymousUsage: false
+
+log:
+  level: DEBUG # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+  format: "common"
+
+entryPoints:
+  web_redirect:
+    address: ":80"
+    http:
+      # https://doc.traefik.io/traefik/v2.2/routing/entrypoints/#redirection
+      redirections:
+        entryPoint:
+          to: websecure
+  websecure:
+    address: ":443"
+    http:
+      tls: {}
+
+providers:
+  file:
+    directory: /etc/traefik/
+    watch: true
+
+api:
+  insecure: true
+  dashboard: true
+
+
+
